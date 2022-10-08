@@ -1,14 +1,17 @@
 <template>
   <Dashboard />
+  <MoodTracker />
 </template>
 
 <script lang="ts">
 import Dashboard from "./components/Dashboard.vue";
+import MoodTracker from "./components/mood-tracker/MoodTracker.vue";
 
 export default {
   name: "App",
   components: {
     Dashboard,
+    MoodTracker,
   },
 };
 </script>
