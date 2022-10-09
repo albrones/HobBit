@@ -24,6 +24,7 @@ export default {
     isSelected: {
       type: Boolean,
       required: true,
+      default: false,
     },
     select: {
       type: Function as PropType<(label: string) => void>,
