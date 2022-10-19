@@ -1,5 +1,6 @@
 <template>
   <div class="mood-tracker">
+    Mood of day
     <template v-if="isExtended">
       <MoodButton
         class="mood-tracker__button good"
@@ -50,7 +51,6 @@
         label="moodOfDay"
         :icon="getIcon(moodOfDay)"
         :isSelected="selected[moodOfDay]"
-        :select="setSelected(moodOfDay)"
       />
     </template>
     <div class="mood-tracker__button-extend-wrapper">
@@ -83,7 +83,7 @@ export default {
       bad: false,
     };
     const selected = ref<SelectedMood>({ ...defaultSelectedValue });
-    const currentValue = ref<Log>({ mood: "" });
+    const currentValue = ref<Log>({ mood: "", hobbies: "" });
     const date = new Date()
       .toISOString()
       .replace("-", "/")
@@ -92,7 +92,7 @@ export default {
     const store = useStore();
 
     const extendIcon = computed(() => {
-      return isExtended.value ? "<" : ">";
+      return isExtended.value ? "➖" : "➕";
     });
 
     onMounted(() => {
@@ -113,23 +113,24 @@ export default {
       // TODO: replace by real icons
       switch (mood) {
         case "good":
-          return ":D";
+          return "😁";
         case "normal":
-          return ":)";
+          return "😊";
         case "medium":
-          return ":|";
+          return "😐";
         case "low":
-          return ":/";
+          return "😕";
         case "down":
-          return ":S";
+          return "🙁";
         case "bad":
+          return "☹️";
         default:
-          return ":(";
+          return "❓";
       }
     };
 
     const updateLocalData = (mood: string) => {
-      if (currentValue.value) {
+      if (currentValue.value.mood) {
         currentValue.value.mood = mood;
         window.localStorage.setItem(date, JSON.stringify(currentValue.value));
 

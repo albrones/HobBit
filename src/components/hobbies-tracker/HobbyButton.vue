@@ -1,16 +1,16 @@
 <template>
   <button
-    :class="[`mood-tracker-button ${label}`, { 'is-selected': isSelected }]"
+    :class="[`hobby-tracker-button ${label}`, { 'is-selected': isSelected }]"
     @click="select"
   >
-    <b class="mood-tracker-button__icon">{{ icon }}</b>
+    <b class="hobby-tracker-button__icon">{{ icon }}</b>
   </button>
 </template>
 
 <script lang="ts">
 import { PropType } from "@vue/runtime-core";
 export default {
-  name: "MoodButton",
+  name: "HobbyButton",
   props: {
     label: {
       type: String,
@@ -35,7 +35,7 @@ export default {
 </script>
 
 <style lang="scss">
-.mood-tracker-button {
+.hobby-tracker-button {
   border-radius: 8px;
   width: 64px;
   height: 64px;
