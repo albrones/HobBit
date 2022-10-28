@@ -1,37 +1,37 @@
 <template>
-  <div class="hobbies-tracker">
+  <div class="house-keeping-tracker">
     Hobbies of day
     <template v-if="isExtended">
       <HobbyButton
-        class="hobbies-tracker__button wood"
+        class="house-keeping-tracker__button wood"
         label="wood"
         :icon="getIcon('wood')"
         :isSelected="selected['wood']"
         :select="setSelected('wood')"
       />
       <HobbyButton
-        class="hobbies-tracker__button music"
+        class="house-keeping-tracker__button music"
         label="music"
         :icon="getIcon('music')"
         :isSelected="selected['music']"
         :select="setSelected('music')"
       />
       <HobbyButton
-        class="hobbies-tracker__button game"
+        class="house-keeping-tracker__button game"
         label="game"
         :icon="getIcon('game')"
         :isSelected="selected['game']"
         :select="setSelected('game')"
       />
       <HobbyButton
-        class="hobbies-tracker__button draw"
+        class="house-keeping-tracker__button draw"
         label="draw"
         :icon="getIcon('draw')"
         :isSelected="selected['draw']"
         :select="setSelected('draw')"
       />
       <HobbyButton
-        class="hobbies-tracker__button cook"
+        class="house-keeping-tracker__button cook"
         label="cook"
         :icon="getIcon('cook')"
         :isSelected="selected['cook']"
@@ -40,16 +40,19 @@
     </template>
     <template v-else>
       <HobbyButton
-        v-for="(hobby, i) in splitedHobbiesOfDay"
+        v-for="(hobby, i) in splitedHouseTasksOfDay"
         :key="i"
-        :class="`hobbies-tracker__button ${hobby}`"
+        :class="`house-keeping-tracker__button ${hobby}`"
         :label="hobby"
         :icon="getIcon(hobby)"
         :isSelected="selected[hobby]"
       />
     </template>
-    <div class="hobbies-tracker__button-extend-wrapper">
-      <button class="hobbies-tracker__button-extend" @click="toggleExtend">
+    <div class="house-keeping-tracker__button-extend-wrapper">
+      <button
+        class="house-keeping-tracker__button-extend"
+        @click="toggleExtend"
+      >
         {{ extendIcon }}
       </button>
     </div>
@@ -57,26 +60,45 @@
 </template>
 
 <script lang="ts">
-import { SelectedHobbies } from "@/components/hobbies-tracker/types/HobbiesTracker-types";
 import { Log } from "@/store/store-types";
 import { computed, onMounted, ref } from "vue";
-import HobbyButton from "@/components/hobbies-tracker/HobbyButton.vue";
+import HobbyButton from "@/components/house-keeping-tracker/HobbyButton.vue";
 import { useStore } from "vuex";
+import { SelectedHouseTasks } from "@/components/house-keeping-tracker/types/HouseKeepingTracker-types";
 export default {
   name: "HobbiesTracker",
   components: { HobbyButton },
   props: {},
   setup() {
-    const hobbiesOfDay = ref<string>("");
+    const tasksStateOfDay = ref<string>("");
     const isExtended = ref<boolean>(false);
     const defaultSelectedValue = {
-      wood: false,
-      music: false,
-      game: false,
-      draw: false,
-      cook: false,
+      living: {
+        lastUpdate: "",
+        delayInDays: 2,
+      },
+      balcony: {
+        lastUpdate: "",
+        delayInDays: 7,
+      },
+      kitchen: {
+        lastUpdate: "",
+        delayInDays: 1,
+      },
+      bathroom: {
+        lastUpdate: "",
+        delayInDays: 4,
+      },
+      bedroom: {
+        lastUpdate: "",
+        delayInDays: 7,
+      },
+      studio: {
+        lastUpdate: "",
+        delayInDays: 2,
+      },
     };
-    const selected = ref<SelectedHobbies>({ ...defaultSelectedValue });
+    const selected = ref<SelectedHouseTasks>({ ...defaultSelectedValue });
     const currentValue = ref<Log>({ mood: "", hobbies: "", houseTasks: "" });
     const date = new Date()
       .toISOString()
@@ -91,12 +113,15 @@ export default {
 
     onMounted(() => {
       currentValue.value = getCurrentData(date);
-      console.log(currentValue.value.hobbies);
+      console.log(currentValue.value.houseTasks);
 
-      if (currentValue.value.hobbies) {
-        hobbiesOfDay.value = currentValue.value.hobbies;
-        splitedHobbiesOfDay.value.forEach((hobby) => {
-          selected.value[hobby] = true;
+      if (currentValue.value.houseTasks) {
+        tasksStateOfDay.value = currentValue.value.houseTasks;
+        splitedHouseTasksOfDay.value.forEach((task) => {
+          selected.value[task] = {
+            delayInDays: selected.value[task].delayInDays,
+            lastUpdate: selected.value[task].lastUpdate,
+          };
         });
       }
     });
@@ -107,19 +132,21 @@ export default {
       return null;
     };
 
-    const getIcon = (hobby: string): string => {
+    const getIcon = (task: string): string => {
       // TODO: replace by real icons
-      switch (hobby) {
-        case "wood":
-          return "🪵";
-        case "music":
-          return "🎹";
-        case "game":
-          return "🎮";
-        case "draw":
-          return "🖊";
-        case "cook":
-          return "🍳";
+      switch (task) {
+        case "living":
+          return "📺";
+        case "balcony":
+          return "⛩";
+        case "kitchen":
+          return "🥣";
+        case "bathroom":
+          return "🛁";
+        case "bedroom":
+          return "🛏";
+        case "studio":
+          return "🖥";
         default:
           return "❓";
       }
@@ -127,20 +154,23 @@ export default {
 
     const updateLocalData = () => {
       if (currentValue.value) {
-        currentValue.value.hobbies = hobbiesOfDay.value;
+        currentValue.value.houseTasks = tasksStateOfDay.value;
         window.localStorage.setItem(date, JSON.stringify(currentValue.value));
         store.commit("updateLog", currentValue.value);
       }
     };
 
-    const setSelected = (hobbies: string) => () => {
-      if (hobbiesOfDay.value !== "") {
-        hobbiesOfDay.value = hobbiesOfDay.value.concat(`,${hobbies}`);
+    const setSelected = (tasks: string) => () => {
+      if (tasksStateOfDay.value !== "") {
+        tasksStateOfDay.value = tasksStateOfDay.value.concat(`,${tasks}`);
       } else {
-        hobbiesOfDay.value = hobbies;
+        tasksStateOfDay.value = tasks;
       }
 
-      selected.value[hobbies] = true;
+      selected.value[tasks] = selected.value[tasks] = {
+        delayInDays: selected.value[tasks].delayInDays,
+        lastUpdate: date,
+      };
       updateLocalData();
     };
 
@@ -148,17 +178,17 @@ export default {
       isExtended.value = !isExtended.value;
     };
 
-    const splitedHobbiesOfDay = computed(() => {
-      if (!hobbiesOfDay.value) return [""];
-      return hobbiesOfDay.value?.split(",");
+    const splitedHouseTasksOfDay = computed(() => {
+      if (!tasksStateOfDay.value) return [""];
+      return tasksStateOfDay.value?.split(",");
     });
 
     return {
-      hobbiesOfDay,
+      tasksStateOfDay,
       isExtended,
       selected,
       extendIcon,
-      splitedHobbiesOfDay,
+      splitedHouseTasksOfDay,
       setSelected,
       getIcon,
       toggleExtend,
@@ -168,7 +198,7 @@ export default {
 </script>
 
 <style lang="scss">
-.hobbies-tracker {
+.house-keeping-tracker {
   display: flex;
   gap: 16px;
   border: solid 1px black;

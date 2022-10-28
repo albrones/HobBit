@@ -83,7 +83,7 @@ export default {
       bad: false,
     };
     const selected = ref<SelectedMood>({ ...defaultSelectedValue });
-    const currentValue = ref<Log>({ mood: "", hobbies: "" });
+    const currentValue = ref<Log>({ mood: "", hobbies: "", houseTasks: "" });
     const date = new Date()
       .toISOString()
       .replace("-", "/")
